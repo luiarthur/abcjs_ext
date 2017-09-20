@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="/js/abcjs_basic_midi_3.1.4-min.js"></script>
+    <script type="text/javascript" src="/abcjs_ext_scala/target/scala-2.11/abcjs_ext_scala-fastopt.js"></script>
+  </head>
+
+  <body>
+
+  <h1>Some Music</h1>
+  <div id="music"></div>
+  <script>
+  var music = `
+  L:1/1
+  A B C |
+  `
+  ABCJS.renderAbc('music', music)
+  </script>
+
+  <h1>Transposed Music</h1>
+  <div id="musicTransposed"></div>
+  <script>
+  var musicTransposed = ABCJS_Ext.transpose('a b c', 'A')
+  ABCJS.renderAbc('musicTransposed','L:1/1\n' + musicTransposed)
+  </script>
+
+  </body>
+
+</html>
