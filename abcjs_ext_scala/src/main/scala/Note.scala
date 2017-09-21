@@ -1,6 +1,11 @@
 package Music
+import scala.scalajs.js
 
 object Note {
+  def insert(s:String, pos:Int, x:String) = {
+    val (a,b) = s.splitAt(pos)
+    a + x + b
+  }
   val letterNames = {'A' to 'G'}.map(_.toString).toVector
   val octaves = Vector.range(0,8)
   val accidentals = List("#", "b", "##", "bb", "", "n")
@@ -19,6 +24,50 @@ object Note {
       "C6", "C6#", "D6", "D6#", "E6", "F6", "F6#", "G6", "G6#", "A6", "A6#", "B6",
       "C7", "C7#", "D7", "D7#", "E7", "F7", "F7#", "G7", "G7#", "A7", "A7#", "B7",
       "C8")
+
+  def letterNamesLooped(i:Int):String = {
+    val idx = i compareTo 0 match {
+      case -1 => letterNames.size + i
+      case _ => i % letterNames.size
+    }
+    letterNames(idx)
+  }
+
+  //Keys
+  val firstFlat = "Bb"
+  val firstSharp = "F#"
+
+  def generateAccidentals(list:List[String], halfSteps:Int, maxSize:Int, acc:String, circleOf:Int):Vector[String] = {
+    if (list.size == maxSize) list.reverse.toVector else {
+      val currentNote = Note(list.head.head.toString, 4, list.head.drop(1))
+      val newNoteTmp = currentNote.transpose(halfSteps)
+
+      val enIdx = letterNames.indexOf(currentNote.letter) + circleOf - 1
+      val newNoteEn = letterNamesLooped(enIdx)
+      val newNote = newNoteTmp.toEnharmonic(newNoteEn)
+
+      generateAccidentals(newNote.letter + newNote.accidental :: list, halfSteps, maxSize, acc, circleOf)
+    }
+  }
+
+  val sharpOrder = generateAccidentals(List(firstSharp), halfSteps=7, maxSize=7, acc="#", circleOf=5)
+  val flatOrder = generateAccidentals(List(firstFlat), halfSteps=5, maxSize=7, acc="b", circleOf=4)
+
+  val circleOf5th = generateAccidentals(List("C"), halfSteps=7, maxSize=8,acc="#",circleOf=5)
+  val circleOf4th = generateAccidentals(List("C"), halfSteps=5, maxSize=8,acc="b",circleOf=4)
+
+  val keySigs = {
+    val m = js.Dictionary("C" -> Vector[String]())
+    var i = 1
+    while (i < 8) {
+      m.update(circleOf5th(i), sharpOrder.take(i))
+      m.update(circleOf4th(i),  flatOrder.take(i))
+      i += 1
+    }
+    m
+  }
+  
+  
 }
 
 
@@ -27,6 +76,34 @@ case class Note(letter: String, octave: Int, accidental: String="") {
 
   override def toString: String = {
     letter + octave + accidental
+  }
+
+
+  def toAbsoluteNote(key:String):Note = {
+    val ks = keySigs(key).filter(_.contains(letter))
+
+    (this.accidental, ks.size) match {
+      case ("", 1) => Note(letter, octave, ks.head.drop(1))
+      case ("n", 1) => Note(letter, octave, accidental)
+      case _ => this
+    }
+  }
+
+  //def toRelativeNote(key:String):Note = this
+  def toRelativeNote(key:String):Note = {
+    val ks = keySigs(key)
+
+    // Check if this.Note's lettername is in the key signature
+    if (ks.exists(_.head.toString == letter)) {
+      val ksAcc = ks.head.drop(1)
+      (accidental, ksAcc) match {
+        case ("n",_) => Note(letter, octave, "n")
+        case ("",_) => Note(letter, octave, "n")
+        case (a,k) if a != k => Note(letter, octave, a)
+        case (a,k) if a == k => Note(letter, octave, "")
+        case _ => this
+      }
+    } else this
   }
 
   def standardize: Note = { // Note with sharp
@@ -80,6 +157,24 @@ case class Note(letter: String, octave: Int, accidental: String="") {
     val idx = pianoNotes.indexOf(this.standardize.toString) + halfSteps
     val pi = pianoNotes(idx)
     Note(pi(0).toString, pi(1).toString.toInt, pi.drop(2))
+  }
+
+  def isSpecialNoteInKey(key:String):Boolean = {
+    keySigs(key).exists(_.head.toString == letter)
+  }
+
+  def transposeWithKey(oldKey:String, newKey:String): Note = { 
+    val newKeyNote =  Note(oldKey.head.toString, 4, oldKey.drop(1))
+    val oldKeyNote =  Note(newKey.head.toString, 4, newKey.drop(1))
+    val halfSteps = newKeyNote - oldKeyNote
+
+    val newNote = {
+      val newNoteStd = this.transpose(halfSteps)
+      //val newAcc = 
+    }
+
+    // newNote
+    ???
   }
 
 

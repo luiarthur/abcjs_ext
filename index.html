@@ -15,7 +15,7 @@
     L:1/1
     K: C
 
-    C D E F _G G ^G A _B C'
+    C D E F _G =G ^G A _B B =B C'
   `
   ABCJS.renderAbc('music', util.sanitize(music))
   </script>
@@ -30,8 +30,9 @@
   <h1>Re-Transposed Music</h1>
   <div id="musicReTransposed"></div>
   <script>
-  var musicReTransposed = util.transpose(musicTransposed, 'B')
+  var musicReTransposed = util.transpose(musicTransposed, 'C')
   ABCJS.renderAbc('musicReTransposed', musicReTransposed)
+  //util.tester()
   </script>
 
   </body>

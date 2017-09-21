@@ -2,7 +2,7 @@ package Music
 
 import scala.scalajs.js.annotation._
 import scala.scalajs.js
-import Note.letterNames
+import Note.{letterNames, letterNamesLooped}
 
 @JSExportTopLevel("util")
 object AbcJsExt {
@@ -42,32 +42,31 @@ object AbcJsExt {
   def transpose(music:String, key:String):String = {
     /* TODO: 
      * - don't duplicate accidentals in key signature
-     * - be able to transpose C -> A -> C
      */
     val m = parse(music)
     val oldHeader = m("header")
     val oldText = m("text")
-    val oldKey = getKey(oldHeader)
+    val oldKeyHeader = getKey(oldHeader)
+    val oldKey = oldKeyHeader.split(":").map(_.trim).last
     val halfSteps = toNote(key) - toNote(oldKey)
 
     val enDist = letterNames.indexOf(toNote(key).letter) - 
                  letterNames.indexOf(toNote(oldKey).letter)
 
     val newText = abcRgx.replaceAllIn(oldText, n => {
-      lazy val note = toNote(n.toString)
+      lazy val note = toNote(n.toString)//.toAbsoluteNote(oldKey)
       lazy val newNote = note.transpose(halfSteps)
       //newNote.toAbc
-      val enIdxRaw = letterNames.indexOf(note.letter) + enDist
-      val enIdx = if (enIdxRaw < 0) {
-        letterNames.size + enIdxRaw 
-      } else {
-        enIdxRaw % letterNames.size
-      }
-      newNote.toEnharmonic(letterNames(enIdx)).toAbc
-      //newNote.toAbc
+      val enIdx = letterNames.indexOf(note.letter) + enDist
+      val lname = letterNamesLooped(enIdx)
+      //print(newNote.toEnharmonic(lname) + " ")
+      //print(newNote.toEnharmonic(lname).toRelativeNote(key) + ", ")
+      newNote.toEnharmonic(lname).toAbc
+      //what I want:
+      //toNote(n.toString).transposeWithKey(oldKey, key)
     })
 
-    val newHeader = oldHeader.replace(oldKey, s"K:$key\n") + "\n"
+    val newHeader = oldHeader.replace(oldKeyHeader, s"K:$key\n") + "\n"
 
     sanitize(newHeader + newText)
   }
@@ -93,5 +92,14 @@ object AbcJsExt {
     )
   }
 
+  @JSExport
+  def tester() {
+    println("Printed Tests:")
+    println("sharpOrder: " + Note.sharpOrder.toString)
+    println("flatOrder: "  + Note.flatOrder)
+    println("Circle 5: "   + Note.circleOf5th)
+    println("Circle 4: "   + Note.circleOf4th)
+    println("KeySigs: " + Note.keySigs.toList)
+  }
 }
 
