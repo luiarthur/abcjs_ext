@@ -79,33 +79,6 @@ case class Note(letter: String, octave: Int, accidental: String="") {
   }
 
 
-  def toAbsoluteNote(key:String):Note = {
-    val ks = keySigs(key).filter(_.contains(letter))
-
-    (this.accidental, ks.size) match {
-      case ("", 1) => Note(letter, octave, ks.head.drop(1))
-      case ("n", 1) => Note(letter, octave, accidental)
-      case _ => this
-    }
-  }
-
-  //def toRelativeNote(key:String):Note = this
-  def toRelativeNote(key:String):Note = {
-    val ks = keySigs(key)
-
-    // Check if this.Note's lettername is in the key signature
-    if (ks.exists(_.head.toString == letter)) {
-      val ksAcc = ks.head.drop(1)
-      (accidental, ksAcc) match {
-        case ("n",_) => Note(letter, octave, "n")
-        case ("",_) => Note(letter, octave, "n")
-        case (a,k) if a != k => Note(letter, octave, a)
-        case (a,k) if a == k => Note(letter, octave, "")
-        case _ => this
-      }
-    } else this
-  }
-
   def standardize: Note = { // Note with sharp
     val halfSteps = accidental match {
       case "#"  =>  1
@@ -163,27 +136,61 @@ case class Note(letter: String, octave: Int, accidental: String="") {
     keySigs(key).exists(_.head.toString == letter)
   }
 
+  def accidentalInKeySig(key:String):String = {
+    val ks =  keySigs(key).filter(_.head.toString == letter)
+    assert(ks.size <= 1)
+    if (ks.size == 0) "" else ks.head.tail
+  }
+
   def letterDist(that:Note):Int = {
     letterNames.indexOf(this.letter) - letterNames.indexOf(that.letter)
   }
 
-  def transposeWithKey(oldKey:String, newKey:String): Note = { 
-    val newKeyNote =  Note(oldKey.head.toString, 4, oldKey.drop(1))
-    val oldKeyNote =  Note(newKey.head.toString, 4, newKey.drop(1))
+
+  def toAbsoluteNote(key:String):Note = {
+    //val ks = keySigs(key).filter(_.contains(letter))
+    val accInKey = this.accidentalInKeySig(key) 
+
+    (this.accidental, accInKey) match {
+      case (_, "") => this
+      case ("", _) => Note(letter, octave, accInKey)
+      case ("n", _) => Note(letter, octave, "")
+      case ("#", _) => Note(letter, octave, "#")
+      case ("b", _) => Note(letter, octave, "b")
+      case _ => this
+    }
+  }
+
+  def transposeWithKey(oldKey:String, newKey:String, usingKeySig:Boolean=false): Note = { 
+    val oldNote = this.toAbsoluteNote(oldKey)
+    val newKeyNote =  Note(newKey.head.toString, 4, newKey.drop(1))
+    val oldKeyNote =  Note(oldKey.head.toString, 4, oldKey.drop(1))
     val halfSteps = newKeyNote - oldKeyNote
 
-    val newNote = {
-      val newNoteStd:Note = this.transpose(halfSteps)
-      val letterD = this.letterDist(oldKeyNote)
-      println(this)
-      println(oldKeyNote)
-      println(letterD)
-      val enNote = letterNamesLooped(letterNames.indexOf(this.letter) + letterD)
-      this.toEnharmonic(enNote)
-    }
+    val newNoteStd:Note = oldNote.transpose(halfSteps)
+    val interval = oldNote.letterDist(oldKeyNote)
+    val enNote = letterNamesLooped(letterNames.indexOf(newKeyNote.letter) + interval)
+    val newNote = newNoteStd.toEnharmonic(enNote)
 
-    newNote
-    //???
+
+    if (!usingKeySig) newNote else {
+      val accInKey = newNote.accidentalInKeySig(newKey) 
+      val accInOldKey = oldNote.accidentalInKeySig(oldKey)
+
+      (newNote.accidental, accInKey, oldNote.accidental, accInOldKey) match {
+        case (_,_,c,d) if this.accidental==d && c!="" => newNote.copy(accidental="n")
+
+        case (_, b, "n", _) if b != "" => newNote.copy(accidental=b)
+        case (_,  "", "n", _) => newNote.copy(accidental="n")
+
+        case (a,b,_,_) if a == b  => newNote.copy(accidental="")
+        case (a,b,_,_) if a != "" && a != b => newNote.copy(accidental=newNote.accidental)
+
+        case ("",  b, _, _) if b != "" => newNote.copy(accidental="n")
+
+        case _ => newNote
+      }
+    }
   }
 
 

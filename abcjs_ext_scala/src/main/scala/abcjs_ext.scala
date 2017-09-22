@@ -19,7 +19,7 @@ object AbcJsExt {
 
   def isAccidental(x:String) = List("^","_","^^","__").contains(x)
   def isOctave(x:String) = List(",","'").contains(x)
-  val abcRgx = "[_^]*[ABCDEFGabcdefg][',]*".r
+  val abcRgx = "[=_^]*[ABCDEFGabcdefg][',]*".r
 
   def toNote(abcNote:String):Note = {
     val letter = "[ABCDEFGabcdefg]".r.findFirstIn(abcNote) match {
@@ -30,7 +30,7 @@ object AbcJsExt {
       case Some(x) => 4 - x.count(_ == ',') + x.count(_ == ''')
       case _ => 4
     }
-    val accidental = "[_^]+".r.findFirstIn(abcNote) match {
+    val accidental = "[=_^]+".r.findFirstIn(abcNote) match {
       case Some(x) => x.replace("^", "#").replace("_","b").replace("=","n")
       case _ => ""
     }
@@ -48,24 +48,9 @@ object AbcJsExt {
     val oldText = m("text")
     val oldKeyHeader = getKey(oldHeader)
     val oldKey = oldKeyHeader.split(":").map(_.trim).last
-    val halfSteps = toNote(key) - toNote(oldKey)
-
-    val enDist = letterNames.indexOf(toNote(key).letter) - 
-                 letterNames.indexOf(toNote(oldKey).letter)
 
     val newText = abcRgx.replaceAllIn(oldText, n => {
-      //lazy val note = toNote(n.toString)//.toAbsoluteNote(oldKey)
-      //lazy val newNote = note.transpose(halfSteps)
-      ////newNote.toAbc
-      //val enIdx = letterNames.indexOf(note.letter) + enDist
-      //val lname = letterNamesLooped(enIdx)
-      ////print(newNote.toEnharmonic(lname) + " ")
-      ////print(newNote.toEnharmonic(lname).toRelativeNote(key) + ", ")
-      //newNote.toEnharmonic(lname).toAbc
-      // The above works.
-
-      //Not testing. what I want:
-      toNote(n.toString).transposeWithKey(oldKey, key).toAbc
+      toNote(n.toString).transposeWithKey(oldKey, key, usingKeySig=true).toAbc
     })
 
     val newHeader = oldHeader.replace(oldKeyHeader, s"K:$key\n") + "\n"

@@ -2,7 +2,8 @@
 <html>
   <head>
     <script type="text/javascript" src="/js/abcjs_basic_midi_3.1.4-min.js"></script>
-    <script type="text/javascript" src="/abcjs_ext_scala/target/scala-2.11/abcjs_ext_scala-fastopt.js"></script>
+    <!--script type="text/javascript" src="/abcjs_ext_scala/target/scala-2.11/abcjs_ext_scala-fastopt.js"></script-->
+    <script type="text/javascript" src="/abcjs_ext_scala/target/scala-2.11/abcjs_ext_scala-opt.js"></script>
   </head>
 
   <body>
@@ -32,6 +33,21 @@
   <script>
   var musicReTransposed = util.transpose(musicTransposed, 'C')
   ABCJS.renderAbc('musicReTransposed', musicReTransposed)
+  //util.tester()
+  </script>
+
+  <h1>Test3</h1>
+  <div id="test3"></div>
+  <script>
+  var test3 = util.transpose(musicTransposed, 'Bb')
+  ABCJS.renderAbc('test3', test3)
+  //util.tester()
+  </script>
+
+  <div id="test4"></div>
+  <script>
+  var test4 = util.transpose(test3, 'A')
+  ABCJS.renderAbc('test4', test4)
   //util.tester()
   </script>
 
