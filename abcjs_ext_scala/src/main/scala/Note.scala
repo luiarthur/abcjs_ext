@@ -163,18 +163,27 @@ case class Note(letter: String, octave: Int, accidental: String="") {
     keySigs(key).exists(_.head.toString == letter)
   }
 
+  def letterDist(that:Note):Int = {
+    letterNames.indexOf(this.letter) - letterNames.indexOf(that.letter)
+  }
+
   def transposeWithKey(oldKey:String, newKey:String): Note = { 
     val newKeyNote =  Note(oldKey.head.toString, 4, oldKey.drop(1))
     val oldKeyNote =  Note(newKey.head.toString, 4, newKey.drop(1))
     val halfSteps = newKeyNote - oldKeyNote
 
     val newNote = {
-      val newNoteStd = this.transpose(halfSteps)
-      //val newAcc = 
+      val newNoteStd:Note = this.transpose(halfSteps)
+      val letterD = this.letterDist(oldKeyNote)
+      println(this)
+      println(oldKeyNote)
+      println(letterD)
+      val enNote = letterNamesLooped(letterNames.indexOf(this.letter) + letterD)
+      this.toEnharmonic(enNote)
     }
 
-    // newNote
-    ???
+    newNote
+    //???
   }
 
 

@@ -54,16 +54,18 @@ object AbcJsExt {
                  letterNames.indexOf(toNote(oldKey).letter)
 
     val newText = abcRgx.replaceAllIn(oldText, n => {
-      lazy val note = toNote(n.toString)//.toAbsoluteNote(oldKey)
-      lazy val newNote = note.transpose(halfSteps)
-      //newNote.toAbc
-      val enIdx = letterNames.indexOf(note.letter) + enDist
-      val lname = letterNamesLooped(enIdx)
-      //print(newNote.toEnharmonic(lname) + " ")
-      //print(newNote.toEnharmonic(lname).toRelativeNote(key) + ", ")
-      newNote.toEnharmonic(lname).toAbc
-      //what I want:
-      //toNote(n.toString).transposeWithKey(oldKey, key)
+      //lazy val note = toNote(n.toString)//.toAbsoluteNote(oldKey)
+      //lazy val newNote = note.transpose(halfSteps)
+      ////newNote.toAbc
+      //val enIdx = letterNames.indexOf(note.letter) + enDist
+      //val lname = letterNamesLooped(enIdx)
+      ////print(newNote.toEnharmonic(lname) + " ")
+      ////print(newNote.toEnharmonic(lname).toRelativeNote(key) + ", ")
+      //newNote.toEnharmonic(lname).toAbc
+      // The above works.
+
+      //Not testing. what I want:
+      toNote(n.toString).transposeWithKey(oldKey, key).toAbc
     })
 
     val newHeader = oldHeader.replace(oldKeyHeader, s"K:$key\n") + "\n"
