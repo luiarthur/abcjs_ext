@@ -3,6 +3,7 @@ package Music
 import scala.scalajs.js.annotation._
 import scala.scalajs.js
 import Note.{letterNames, letterNamesLooped}
+import js.JSConverters._
 
 @JSExportTopLevel("util")
 object AbcJsExt {
@@ -78,6 +79,9 @@ object AbcJsExt {
       "text" -> {text.mkString("\n") + "\n"}
     )
   }
+
+  @JSExport
+  val keySigs = Note.keySigs.keys.toJSArray
 
   @JSExport
   def tester() {
