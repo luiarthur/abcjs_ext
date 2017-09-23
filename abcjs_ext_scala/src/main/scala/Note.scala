@@ -152,9 +152,11 @@ case class Note(letter: String, octave: Int, accidental: String="") {
     val accInKey = this.accidentalInKeySig(key) 
 
     (this.accidental, accInKey) match {
+      //case ("bb", "b") => this.copy(accidental="b")
+      //case ("##", "#") => this.copy(accidental="#")
       case (_, "") => this
       case ("", _) => Note(letter, octave, accInKey)
-      case ("n", _) => Note(letter, octave, "")
+      case ("n", _) => Note(letter, octave, "n")
       case ("#", _) => Note(letter, octave, "#")
       case ("b", _) => Note(letter, octave, "b")
       case _ => this
@@ -178,6 +180,11 @@ case class Note(letter: String, octave: Int, accidental: String="") {
       val accInOldKey = oldNote.accidentalInKeySig(oldKey)
 
       (newNote.accidental, accInKey, oldNote.accidental, accInOldKey) match {
+
+        // FIXME: These two lines???
+        case (_, "#", "##", "#") => this.copy(accidental="#")
+        case (_, "b", "bb", "b") => this.copy(accidental="b")
+
         case (_,_,c,d) if this.accidental==d && c!="" => newNote.copy(accidental="n")
 
         case (_, b, "n", _) if b != "" => newNote.copy(accidental=b)

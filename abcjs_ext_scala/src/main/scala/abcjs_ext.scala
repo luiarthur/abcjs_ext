@@ -12,7 +12,7 @@ object AbcJsExt {
 
   @JSExport
   def getKey(header:String):String = {
-    "K:\\s*\\w+".r.findFirstIn(header) match {
+    "K:.*".r.findFirstIn(header) match {
       case Some(x) => x
       case _ => "C"
     }
