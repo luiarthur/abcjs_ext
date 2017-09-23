@@ -8,7 +8,7 @@
 
   <body>
 
-  <h1>Some Music</h1>
+  <h3>Some Music</h3>
   <div id="music"></div>
   <script>
   var music = `
@@ -16,39 +16,38 @@
     L:1/1
     K: C
 
-    CDEF_G=G^GA_BB=BC'
+    CDEFG^GABC'
   `
   ABCJS.renderAbc('music', util.sanitize(music))
   </script>
 
-  <h1>Transposed Music</h1>
-  <div id="musicTransposed"></div>
+  <h3>Music (A)</h3>
+  <div id="musicA"></div>
   <script>
-  var musicTransposed = util.transpose(music, 'A')
-  ABCJS.renderAbc('musicTransposed', musicTransposed)
+  var musicA = util.transpose(music, 'A')
+  ABCJS.renderAbc('musicA', musicA)
   </script>
 
-  <h1>Re-Transposed Music</h1>
-  <div id="musicReTransposed"></div>
+  <h3>Re-Transposed Music</h3>
+  <div id="musicC"></div>
   <script>
-  var musicReTransposed = util.transpose(musicTransposed, 'C')
-  ABCJS.renderAbc('musicReTransposed', musicReTransposed)
+  var musicC = util.transpose(musicA, 'C')
+  ABCJS.renderAbc('musicC', musicC)
   //util.tester()
   </script>
-
-  <h1>Test3</h1>
-  <div id="test3"></div>
+  
+  <h3>Music (F#)</h3>
+  <div id="musicFs"></div>
   <script>
-  var test3 = util.transpose(musicTransposed, 'Bb')
-  ABCJS.renderAbc('test3', test3)
-  //util.tester()
+  var musicFs = util.transpose(musicA, 'F#')
+  ABCJS.renderAbc('musicFs', musicFs)
   </script>
 
-  <div id="test4"></div>
+  <h3>Music (C)</h3>
+  <div id="musicC2"></div>
   <script>
-  var test4 = util.transpose(test3, 'A')
-  ABCJS.renderAbc('test4', test4)
-  //util.tester()
+  var musicC2 = util.transpose(musicFs, 'C')
+  ABCJS.renderAbc('musicC2', musicC2)
   </script>
 
   </body>
