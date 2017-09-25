@@ -169,7 +169,6 @@ case class Note(letter: String, octave: Int, accidental: String="") {
     val enNote = letterNamesLooped(letterNames.indexOf(newKeyNote.letter) + interval)
     val newNote = newNoteStd.toEnharmonic(enNote)
 
-
     if (!usingKeySig) newNote else if (oldKey==newKey) this else {
       val accInKey = newNote.accidentalInKeySig(newKey) 
 
