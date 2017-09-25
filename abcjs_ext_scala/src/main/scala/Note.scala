@@ -129,7 +129,9 @@ case class Note(letter: String, octave: Int, accidental: String="") {
     )
     val idx = pianoNotes.indexOf(this.standardize.toString) + halfSteps
     val pi = pianoNotes(idx)
-    Note(pi(0).toString, pi(1).toString.toInt, pi.drop(2))
+    if (halfSteps == 0) this else {
+      Note(pi(0).toString, pi(1).toString.toInt, pi.drop(2))
+    }
   }
 
   def isSpecialNoteInKey(key:String):Boolean = {
@@ -148,17 +150,10 @@ case class Note(letter: String, octave: Int, accidental: String="") {
 
 
   def toAbsoluteNote(key:String):Note = {
-    //val ks = keySigs(key).filter(_.contains(letter))
     val accInKey = this.accidentalInKeySig(key) 
 
     (this.accidental, accInKey) match {
-      //case ("bb", "b") => this.copy(accidental="b")
-      //case ("##", "#") => this.copy(accidental="#")
-      case (_, "") => this
-      case ("", _) => Note(letter, octave, accInKey)
-      case ("n", _) => Note(letter, octave, "n")
-      case ("#", _) => Note(letter, octave, "#")
-      case ("b", _) => Note(letter, octave, "b")
+      case ("", aik) if aik > "" => this.copy(accidental=accInKey)
       case _ => this
     }
   }
@@ -175,26 +170,19 @@ case class Note(letter: String, octave: Int, accidental: String="") {
     val newNote = newNoteStd.toEnharmonic(enNote)
 
 
-    if (!usingKeySig) newNote else {
+    if (!usingKeySig) newNote else if (oldKey==newKey) this else {
       val accInKey = newNote.accidentalInKeySig(newKey) 
-      val accInOldKey = oldNote.accidentalInKeySig(oldKey)
 
-      (newNote.accidental, accInKey, oldNote.accidental, accInOldKey) match {
+      (newNote.accidental, accInKey) match {
 
-        // FIXME: These two lines???
-        case (_, "#", "##", "#") => this.copy(accidental="#")
-        case (_, "b", "bb", "b") => this.copy(accidental="b")
+        // Double sharps or double flats are carried
+        case (a, _) if a.size > 1 => newNote
 
-        case (_,_,c,d) if this.accidental==d && c!="" => newNote.copy(accidental="n")
+        // accidentals in key signature are not repeated
+        case (a, b) if a==b && b > "" => newNote.copy(accidental="")
 
-        case (_, b, "n", _) if b != "" => newNote.copy(accidental=b)
-        case (_,  "", "n", _) => newNote.copy(accidental="n")
-
-        case (a,b,_,_) if a == b  => newNote.copy(accidental="")
-        case (a,b,_,_) if a != "" && a != b => newNote.copy(accidental=newNote.accidental)
-
-        case ("",  b, _, _) if b != "" => newNote.copy(accidental="n")
-
+        // if the original note has an accidental then the new note must also
+        case (a, _) if this.accidental > "" && a == "" => newNote.copy(accidental="n")
         case _ => newNote
       }
     }
