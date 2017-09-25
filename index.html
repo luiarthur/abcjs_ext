@@ -1,55 +1,54 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <script type="text/javascript" src="/js/abcjs_basic_midi_3.1.4-min.js"></script>
-    <script type="text/javascript" src="/abcjs_ext_scala/target/scala-2.11/abcjs_ext_scala-fastopt.js"></script>
-    <!--script type="text/javascript" src="/abcjs_ext_scala/target/scala-2.11/abcjs_ext_scala-opt.js"></script-->
-  </head>
+<head>
+  <script src='/js/jquery.min.js'></script>
+  <script src='/js/bootstrap.min.js'></script>
+  <script type="text/javascript" src="/js/abcjs_basic_midi_3.1.4-min.js"></script>
+  <script type="text/javascript" src="/abcjs_ext_scala/target/scala-2.11/abcjs_ext_scala-fastopt.js"></script>
+  <!--script type="text/javascript" src="/abcjs_ext_scala/target/scala-2.11/abcjs_ext_scala-opt.js"></script-->
 
-  <body>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
 
-  <h3>Some Music</h3>
-  <div id="music"></div>
-  <script>
-  var music = `
-    %%staffwidth 500
-    L:1/1
-    K: C
+<body>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">Jazz Scales</a>
+      </div>
+      <ul id="main-navbar" class="nav navbar-nav">
+        <li data-toggle="dropdown" class="active" id='home'>
+          <a href="#">Home</a>
+        </li>
 
-    CDEFG^GABC'
-  `
-  ABCJS.renderAbc('music', util.sanitize(music))
-  </script>
+        <li data-toggle="dropdown" id='lists'>
+          <a class="dropdown-toggle" data-toggle="dropdown"href="#">Lists</a>
+        </li>
 
-  <h3>Music (A)</h3>
-  <div id="musicA"></div>
-  <script>
-  var musicA = util.transpose(music, 'A')
-  ABCJS.renderAbc('musicA', musicA)
-  </script>
+        <li data-toggle="dropdown" id='collections'>
+          <a class="dropdown-toggle" data-toggle="dropdown"href="#">Collections</a>
+        </li>
 
-  <h3>Re-Transposed Music</h3>
-  <div id="musicC"></div>
-  <script>
-  var musicC = util.transpose(musicA, 'C')
-  ABCJS.renderAbc('musicC', musicC)
-  //util.tester()
-  </script>
-  
-  <h3>Music (F#)</h3>
-  <div id="musicFs"></div>
-  <script>
-  var musicFs = util.transpose(musicA, 'F#')
-  ABCJS.renderAbc('musicFs', musicFs)
-  </script>
+        <li data-toggle="dropdown" id='all'>
+          <a class="dropdown-toggle" data-toggle="dropdown"href="#">All</a>
+        </li>
 
-  <h3>Music (C)</h3>
-  <div id="musicC2"></div>
-  <script>
-  var musicC2 = util.transpose(musicFs, 'C')
-  ABCJS.renderAbc('musicC2', musicC2)
-  </script>
+        <li data-toggle="dropdown" id='transpose'>
+          <a class="dropdown-toggle" data-toggle="dropdown"href="#">Transpose</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
 
-  </body>
-
+  <div class='container-fluid'>
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <h1 id='musicID'> </h1>
+        <div id='music'></div>
+      </div>
+    </div>
+  </div>
+</body>
+<script src='/js/jazz_interface.js'></script>
 </html>

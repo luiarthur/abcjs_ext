@@ -1,0 +1,10 @@
+{"jazzData":[
+  {"type": "scale", "name": "Cdim6", "list": ["favorites", "routines"],
+   "music": "L:1/1\nK:C\nCDEFG^GABC'"},
+  {"type": "scale", "name": "C", "list": ["routines"],
+   "music": "L:1/1\nK:C\nCDEFGABC'"},
+  {"type": "chord", "name":"C", "list":"favorites", "music":"L:1/1\nK:C\n[EGBD]"},
+  {"type":"custom", "name":"custom1", "list":"none", "music":"L:1/1\nK:C\n[C E] | D"},
+  {"type": "custom", "name":"custom2", "list":"none", "music":"L:1/1\nK:C\n[C E] |\nFGA\n"}
+]}
+
