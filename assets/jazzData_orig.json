@@ -1,6 +1,8 @@
 {"jazzData":[
   {"type": "scale", "name": "dim6", "list": [],
    "music": "L:1/1\nK:C\nCDEFG^GABC'"},
+  {"type": "scale", "name": "longdim6", "list": [],
+   "music": "L:1/1\nK:C\nA,B,CDEFG^GABC'"},
   {"type": "scale", "name": "bluesMaj", "list": [],
    "music": "L:1/1\nK:C\nC_EF^FG_BC'"}
 ]}

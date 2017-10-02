@@ -203,7 +203,10 @@ case class Note(letter: String, octave: Int, accidental: String="") {
       case _ => ""
     }
 
-    val abcOct = {if (octave > 0) "'" * (octave-4) else "_" * (4-octave)}
+    val abcOct = octave match {
+      case o if o > 4 => "'" * (octave-4) 
+      case _ => "," * (4-octave)
+    }
 
     abcAcc + letter + abcOct
   }
