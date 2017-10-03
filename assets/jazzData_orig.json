@@ -4,6 +4,8 @@
   {"type": "scale", "name": "longdim6", "list": [],
    "music": "L:1/1\nK:C\nA,B,CDEFG^GABC'"},
   {"type": "scale", "name": "bluesMaj", "list": [],
-   "music": "L:1/1\nK:C\nC_EF^FG_BC'"}
+   "music": "L:1/1\nK:C\nC_EF^FG_BC'"},
+  {"type": "scale", "name": "bebop", "list": [],
+   "music": "L:1/1\nK:C\nCDEFGA_B=BC'"}
 ]}
 

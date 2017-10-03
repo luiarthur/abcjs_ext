@@ -173,15 +173,13 @@ case class Note(letter: String, octave: Int, accidental: String="") {
       val accInKey = newNote.accidentalInKeySig(newKey) 
 
       (newNote.accidental, accInKey) match {
-
-        // Double sharps or double flats are carried
-        case (a, _) if a.size > 1 => newNote
+        // if the original note has an accidental then the new note must also
+        case (a, _) if this.accidental > "" => 
+          newNote.copy(accidental = if (a=="") "n" else a)
 
         // accidentals in key signature are not repeated
         case (a, b) if a==b && b > "" => newNote.copy(accidental="")
 
-        // if the original note has an accidental then the new note must also
-        case (a, _) if this.accidental > "" && a == "" => newNote.copy(accidental="n")
         case _ => newNote
       }
     }
