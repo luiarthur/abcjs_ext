@@ -6,6 +6,8 @@
   {"type": "scale", "name": "bluesMaj", "list": [],
    "music": "L:1/1\nK:C\nC_EF^FG_BC'"},
   {"type": "scale", "name": "bebop", "list": [],
-   "music": "L:1/1\nK:C\nCDEFGA_B=BC'"}
+   "music": "L:1/1\nK:C\nCDEFGA_B=BC'"},
+  {"type": "blurp", "name": "251", "list": [],
+   "music": "L:1/1\nK:C\nV:1\n[FA]|[FA]|[EG]||\nV:2 clef=bass\n[D,C]|[G,B,]|[C,B,]||"}
 ]}
 
