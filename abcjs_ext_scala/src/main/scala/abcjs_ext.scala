@@ -21,6 +21,8 @@ object AbcJsExt {
   def isAccidental(x:String) = List("^","_","^^","__").contains(x)
   def isOctave(x:String) = List(",","'").contains(x)
   val abcRgx = "[=_^]*[ABCDEFGabcdefg][',]*".r
+  val matchComment = """(?m)^((\w:)|%).*""".r
+  //val matchCommand = """(?m)^(?![\w|%]:).*""".r
 
   def toNote(abcNote:String):Note = {
     val letter = "[ABCDEFGabcdefg]".r.findFirstIn(abcNote) match {
@@ -46,17 +48,28 @@ object AbcJsExt {
      */
     val m = parse(music)
     val oldHeader = m("header")
-    val oldText = m("text")
     val oldKeyHeader = getKey(oldHeader)
     val oldKey = oldKeyHeader.split(":").map(_.trim).last
 
-    val newText = abcRgx.replaceAllIn(oldText, n => {
-      toNote(n.toString).transposeWithKey(oldKey, key, usingKeySig=true).toAbc
-    })
+    //var newMusic = abcRgx.replaceAllIn(oldText, n => {
+    //  toNote(n.toString).transposeWithKey(oldKey, key, usingKeySig=true).toAbc
+    //})
 
-    val newHeader = oldHeader.replace(oldKeyHeader, s"K:$key\n") + "\n"
+    val xs = music.split("\\n")
+    val numLines = xs.size
+    var newMusic = Vector.tabulate(numLines){ lineNum => 
+      xs(lineNum).matches(matchComment.toString) match {
+        case true => xs(lineNum)
+        case _ => abcRgx.replaceAllIn(xs(lineNum), n => {
+          toNote(n.toString).transposeWithKey(oldKey, key, usingKeySig=true).toAbc
+        })
+      }
+    }.mkString("\n")
 
-    sanitize(newHeader + newText)
+    newMusic = newMusic.replace(oldKeyHeader, s"K:$key\n")
+    println(newMusic)
+
+    sanitize(newMusic)
   }
 
 
@@ -94,3 +107,27 @@ object AbcJsExt {
   }
 }
 
+/* I want to ignore lines that start with %% and _:___
+val x = """L:1/1
+K:C
+V:1
+[FA]|[FA]|[EG]||
+V:2 clef=bass
+[D,C]|[G,B,]|[C,B,]||
+
+CDEFGA_B=BC'"""
+
+val matchComment = """(?m)^[\w|%]:.*""".r
+val matchCommand = """(?m)^(?![\w|%]:).*""".r
+
+val xs = x.split("\\n")
+val numLines = x.split("\\n").size
+Vector.tabulate(numLines){ lineNum => 
+  xs(i).matches(matchComment.toString) match {
+    case true => xs(i)
+    case _ => abcRgx.replaceAllIn(xs(i), n => {
+      toNote(n.toString).transposeWithKey(oldKey, key, usingKeySig=true).toAbc
+    })
+  }
+}
+ */
