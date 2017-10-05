@@ -72,6 +72,25 @@ object AbcJsExt {
     sanitize(newMusic)
   }
 
+  def transposeOctave(music:String, up:Boolean):String = {
+    val xs = music.split("\\n")
+    val numLines = xs.size
+    var newMusic = Vector.tabulate(numLines){ lineNum => 
+      xs(lineNum).matches(matchComment.toString) match {
+        case true => xs(lineNum)
+        case _ => abcRgx.replaceAllIn(xs(lineNum), n => {
+          toNote(n.toString).transpose(if (up) 12 else -12).toAbc
+        })
+      }
+    }.mkString("\n")
+
+    sanitize(newMusic)
+  }
+
+  @JSExport
+  def octaveUp(music:String):String = transposeOctave(music, up=true);
+  @JSExport
+  def octaveDown(music:String):String = transposeOctave(music, up=false);
 
   @JSExport
   def sanitize(music:String):String = {

@@ -130,6 +130,26 @@ function showExample() {
   fillTextArea(glob.fileContent);
 }
 
+currentOctave = 0;
+$("#musicID").on('click', function() {
+  console.log(glob.music);
+  if (currentOctave == 0) {
+    glob.music = util.octaveUp(glob.music);
+    currentOctave = 1;
+  } else if (currentOctave == 1) {
+    glob.music = util.octaveDown(glob.music);
+    glob.music = util.octaveDown(glob.music);
+    currentOctave = -1;
+  } else {
+    glob.music = util.octaveUp(glob.music);
+    currentOctave = 0;
+  }
+
+  var staffWidth = $('#edit').width() * 0.75;
+  var music = '%%staffwidth ' + staffWidth + '\n' + glob.music;
+  console.log(music)
+  ABCJS.renderAbc('music', music);
+});
 
 /*  500: 695
  *  600: 828
