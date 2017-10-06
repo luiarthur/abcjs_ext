@@ -20,7 +20,15 @@ object AbcJsExt {
 
   def isAccidental(x:String) = List("^","_","^^","__").contains(x)
   def isOctave(x:String) = List(",","'").contains(x)
-  val abcRgx = "[=_^]*[ABCDEFGabcdefg][',]*".r
+  //val abcRgx = "[=_^]*[ABCDEFGabcdefg][',]*".r
+  //val abcRgx = "(?!<\")[=_^]*[ABCDEFGabcdefg][',]*".r // js doesn't support this
+
+  val breaker = ";;;;;"
+  val chordRgx = "\"[ABCDEFGabcdefg][#b]?[^\"]*\"".r
+  val shortChordRgx = "\"[=_^]*[ABCDEFGabcdefg]".r
+  val abcRgx = "\"?[=_^]*[ABCDEFGabcdefg][',]*".r
+
+
   val matchComment = """(?m)^((\w:)|%).*""".r
   //val matchCommand = """(?m)^(?![\w|%]:).*""".r
 
@@ -51,23 +59,37 @@ object AbcJsExt {
     val oldKeyHeader = getKey(oldHeader)
     val oldKey = oldKeyHeader.split(":").map(_.trim).last
 
-    //var newMusic = abcRgx.replaceAllIn(oldText, n => {
-    //  toNote(n.toString).transposeWithKey(oldKey, key, usingKeySig=true).toAbc
-    //})
-
     val xs = music.split("\\n")
     val numLines = xs.size
     var newMusic = Vector.tabulate(numLines){ lineNum => 
       xs(lineNum).matches(matchComment.toString) match {
         case true => xs(lineNum)
-        case _ => abcRgx.replaceAllIn(xs(lineNum), n => {
-          toNote(n.toString).transposeWithKey(oldKey, key, usingKeySig=true).toAbc
-        })
+        //case _ => abcRgx.replaceAllIn(xs(lineNum), n => {
+        //  toNote(n.toString).transposeWithKey(oldKey, key, usingKeySig=true).toAbc
+        //})
+        case _ => {
+          val y = chordRgx.replaceAllIn(xs(lineNum), n => {
+            val tmp = n.toString + breaker
+            tmp(2) match {
+              case '#' => "\"^" + tmp(1) + tmp.drop(3)
+              case 'b' => "\"_" + tmp(1) + tmp.drop(3)
+              case _ => tmp
+            }
+          })
+
+          abcRgx.replaceAllIn(y, n => n.toString match {
+            // replace chord
+            case z if z.matches(shortChordRgx.toString) => 
+              "\"" + toNote(z.toString.tail).transposeWithKey(oldKey, key, usingKeySig=false).toString.replaceAll("\\d","")
+            // replace note
+            case _ => toNote(n.toString).transposeWithKey(oldKey, key, usingKeySig=true).toAbc
+          }).replace(breaker,"")
+        }
+
       }
     }.mkString("\n")
 
     newMusic = newMusic.replace(oldKeyHeader, s"K:$key\n")
-    println(newMusic)
 
     sanitize(newMusic)
   }
@@ -75,12 +97,28 @@ object AbcJsExt {
   def transposeOctave(music:String, up:Boolean):String = {
     val xs = music.split("\\n")
     val numLines = xs.size
-    var newMusic = Vector.tabulate(numLines){ lineNum => 
+
+    val newMusic = Vector.tabulate(numLines){ lineNum => 
       xs(lineNum).matches(matchComment.toString) match {
         case true => xs(lineNum)
-        case _ => abcRgx.replaceAllIn(xs(lineNum), n => {
-          toNote(n.toString).transpose(if (up) 12 else -12).toAbc
-        })
+        case _ => {
+          val y = chordRgx.replaceAllIn(xs(lineNum), n => {
+            val tmp = n.toString + breaker
+            tmp(2) match {
+              case '#' => "\"^" + tmp(1) + tmp.drop(3)
+              case 'b' => "\"_" + tmp(1) + tmp.drop(3)
+              case _ => tmp
+            }
+          })
+
+          abcRgx.replaceAllIn(y, n => n.toString match {
+            // replace chord
+            case z if z.matches(shortChordRgx.toString) =>
+              "\"" + toNote(z.toString.tail).toString.replaceAll("\\d","")
+            // replace note
+            case _ => toNote(n.toString).transpose(if (up) 12 else -12).toAbc
+          }).replace(breaker,"")
+        }
       }
     }.mkString("\n")
 
