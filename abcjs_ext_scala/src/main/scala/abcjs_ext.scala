@@ -154,6 +154,20 @@ object AbcJsExt {
   val keySigs = Note.keySigs.keys.toJSArray
 
   @JSExport
+  def blockChord(music:String, interval:js.Array[Int]): String={
+    val m = music.trim.split("\n")
+    val header = m.dropRight(1).mkString("\n") + "\n"
+    val root = getKey(header)
+
+    val scaleString = m.last
+    val notes = abcRgx.findAllIn(scaleString).toList.map(toNote)
+
+    val bc = Scale(notes, root).blockChord(interval.toList)
+
+    header + bc.map(chord => "[" + chord.map(_.toAbc).mkString + "]").mkString
+  }
+
+  @JSExport
   def tester() {
     println("Printed Tests:")
     println("sharpOrder: " + Note.sharpOrder.toString)
