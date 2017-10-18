@@ -129,8 +129,12 @@ case class Note(letter: String, octave: Int, accidental: String="") {
     )
     val idx = pianoNotes.indexOf(this.standardize.toString) + halfSteps
     val pi = pianoNotes(idx)
-    if (halfSteps == 0) this else {
-      Note(pi(0).toString, pi(1).toString.toInt, pi.drop(2))
+
+    halfSteps match {
+      case 0 => this
+      case 12 => this.copy(octave=octave+1)
+      case -12 => this.copy(octave=octave-1)
+      case _  => Note(pi(0).toString, pi(1).toString.toInt, pi.drop(2))
     }
   }
 
